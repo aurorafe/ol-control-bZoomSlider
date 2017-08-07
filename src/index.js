@@ -79,6 +79,12 @@ ol.control.BZoomSlider = function (params) {
    */
   this.duration_ = this.options['duration'] !== undefined ? this.options['duration'] : 200
 
+  /**
+   * @private
+   * @type {number}
+   */
+  this.pixelDelta_ = this.options['pixelDelta'] !== undefined ? this.options['pixelDelta'] : 128
+
   let className = (this.options.className !== undefined ? this.options.className : 'hmap-zoom-slider')
   /**
    * @private
@@ -166,7 +172,49 @@ ol.control.BZoomSlider.prototype.handleZoomClick_ = function (delta, event) {
  */
 ol.control.BZoomSlider.prototype.handletranslateClick_ = function (type, event) {
   event.preventDefault()
-  console.log(type)
+  let view = this.getMap().getView()
+  let mapUnitsDelta = view.getResolution() * this.pixelDelta_
+  let [deltaX, deltaY] = [0, 0]
+  switch (type) {
+    case 'translateN':
+      deltaY = mapUnitsDelta
+      break
+    case 'translateS':
+      deltaY = -mapUnitsDelta
+      break
+    case 'translateW':
+      deltaX = mapUnitsDelta
+      break
+    case 'translateE':
+      deltaX = -mapUnitsDelta
+      break
+  }
+  let delta = [deltaX, deltaY]
+  ol.coordinate.rotate(delta, view.getRotation())
+  this.pan(view, delta, this.duration_)
+}
+
+/**
+ * 平移地图
+ * @param view
+ * @param delta
+ * @param optDuration
+ */
+ol.control.BZoomSlider.prototype.pan = function (view, delta, optDuration) {
+  let currentCenter = view.getCenter()
+  if (currentCenter) {
+    let center = view.constrainCenter(
+      [currentCenter[0] + delta[0], currentCenter[1] + delta[1]])
+    if (optDuration) {
+      view.animate({
+        duration: optDuration,
+        easing: ol.easing.linear,
+        center: center
+      })
+    } else {
+      view.setCenter(center)
+    }
+  }
 }
 
 /**
