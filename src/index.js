@@ -123,24 +123,29 @@ ol.control.BZoomSlider = function (params) {
     ol.control.BZoomSlider.prototype.handleZoomClick_.bind(this, -1))
 
   let slider = htmlUtils.create('div', ('hmap-zoom-slider-zoom-slider' + ' ' + css.CLASS_SELECTABLE), silderContent)
-  htmlUtils.create('div', ('slider-background-top' + ' ' + css.CLASS_SELECTABLE), slider)
-  htmlUtils.create('div', ('slider-background-bottom' + ' ' + css.CLASS_SELECTABLE), slider)
+  this.sliderBackgroundTop = htmlUtils.create('div', ('slider-background-top' + ' ' + css.CLASS_SELECTABLE), slider)
+  this.sliderBackgroundBottom = htmlUtils.create('div', ('slider-background-bottom' + ' ' + css.CLASS_SELECTABLE), slider)
   let sliderBackgroundMask = htmlUtils.create('div', ('slider-background-mask' + ' ' + css.CLASS_SELECTABLE), slider)
   sliderBackgroundMask.setAttribute('title', '缩放到此级别')
-  let sliderBar = htmlUtils.create('div', ('slider-bar' + ' ' + css.CLASS_SELECTABLE), slider)
-  sliderBar.setAttribute('title', '滑动缩放地图')
+  this.sliderBar = htmlUtils.create('div', ('slider-bar' + ' ' + css.CLASS_SELECTABLE), slider)
+  this.sliderBar.setAttribute('title', '滑动缩放地图')
+  /**
+   * 滑块容器
+   * @type {Element}
+   */
+  this.silderContent = silderContent
 
   /**
    * @type {ol.pointer.PointerEventHandler}
    * @private
    */
-  // this.dragger_ = new ol.pointer.PointerEventHandler(slider)
-  //
-  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERDOWN, this.handleDraggerStart_, this)
-  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERMOVE, this.handleDraggerDrag_, this)
-  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERUP, this.handleDraggerEnd_, this)
-  Events.listen(slider, Events.eventType.CLICK, this.handleContainerClick_, this)
-  Events.listen(sliderBackgroundMask, Events.eventType.CLICK, function (event) {
+  this.dragger_ = new ol.pointer.PointerEventHandler(this.silderContent)
+
+  Events.listen(this.dragger_, ol.pointer.EventType.POINTERDOWN, this.handleDraggerStart_, this)
+  Events.listen(this.dragger_, ol.pointer.EventType.POINTERMOVE, this.handleDraggerDrag_, this)
+  Events.listen(this.dragger_, ol.pointer.EventType.POINTERUP, this.handleDraggerEnd_, this)
+  Events.listen(this.silderContent, Events.eventType.CLICK, this.handleContainerClick_, this)
+  Events.listen(this.sliderBar, Events.eventType.CLICK, function (event) {
     event.stopPropagation()
   })
   let render = this.options['render'] ? this.options['render'] : ol.control.BZoomSlider.render
@@ -301,11 +306,11 @@ ol.control.BZoomSlider.prototype.disposeInternal = function () {
  * @private
  */
 ol.control.BZoomSlider.prototype.initSlider_ = function () {
-  let container = this.element
+  let container = this.silderContent
   let containerSize = {
     width: container.offsetWidth, height: container.offsetHeight
   }
-  let thumb = container.firstElementChild
+  let thumb = htmlUtils.getElementsByClassName('.slider-bar', container)
   let computedStyle = getComputedStyle(thumb)
   let thumbWidth = thumb.offsetWidth +
     parseFloat(computedStyle['marginRight']) +
@@ -346,7 +351,7 @@ ol.control.BZoomSlider.prototype.handleContainerClick_ = function (event) {
  * @private
  */
 ol.control.BZoomSlider.prototype.handleDraggerStart_ = function (event) {
-  if (!this.dragging_ && event.originalEvent.target === this.element.firstElementChild) {
+  if (!this.dragging_ && event.originalEvent.target === htmlUtils.getElementsByClassName('.slider-bar', this.silderContent)) {
     this.getMap().getView().setHint(ol.ViewHint.INTERACTING, 1)
     this.previousX_ = event.clientX
     this.previousY_ = event.clientY
@@ -361,7 +366,7 @@ ol.control.BZoomSlider.prototype.handleDraggerStart_ = function (event) {
  */
 ol.control.BZoomSlider.prototype.handleDraggerDrag_ = function (event) {
   if (this.dragging_) {
-    let element = this.element.firstElementChild
+    let element = htmlUtils.getElementsByClassName('.slider-bar', this.silderContent)
     let deltaX = event.clientX - this.previousX_ + parseInt(element.style.left, 10)
     let deltaY = event.clientY - this.previousY_ + parseInt(element.style.top, 10)
     let relativePosition = this.getRelativePosition_(deltaX, deltaY)
@@ -400,11 +405,13 @@ ol.control.BZoomSlider.prototype.handleDraggerEnd_ = function (event) {
  */
 ol.control.BZoomSlider.prototype.setThumbPosition_ = function (res) {
   let position = this.getPositionForResolution_(res)
-  let thumb = this.element.firstElementChild
+  let thumb = htmlUtils.getElementsByClassName('.slider-bar', this.silderContent)
   if (this.direction_ === ol.control.BZoomSlider.Direction_.HORIZONTAL) {
     thumb.style.left = this.widthLimit_ * position + 'px'
+    this.sliderBackgroundBottom.style.width = this.widthLimit_ - (this.widthLimit_ * position - 5) + 'px'
   } else {
     thumb.style.top = this.heightLimit_ * position + 'px'
+    this.sliderBackgroundBottom.style.height = this.heightLimit_ - (this.heightLimit_ * position - 5) + 'px'
   }
 }
 
@@ -440,34 +447,32 @@ ol.control.BZoomSlider.prototype.getResolutionForPosition_ = function (position)
 
 /**
  * 获取值
+ * @param resolution
  * @param optPower
+ * @returns {number}
  */
-ol.control.BZoomSlider.prototype.getValueForResolutionFunction = function (optPower) {
+ol.control.BZoomSlider.prototype.getValueForResolutionFunction = function (resolution, optPower) {
   let power = optPower || 2
   let view = this.getMap().getView()
   let maxResolution = view.getMaxResolution()
   let minResolution = view.getMinResolution()
   let max = Math.log(maxResolution / minResolution) / Math.log(power)
-  return (function (resolution) {
-    let value = (Math.log(maxResolution / resolution) / Math.log(power)) / max
-    return value
-  })()
+  return ((Math.log(maxResolution / resolution) / Math.log(power)) / max)
 }
 
 /**
  * 获取分辨率
+ * @param value
  * @param optPower
+ * @returns {number}
  */
-ol.control.BZoomSlider.prototype.getResolutionForValueFunction = function (optPower) {
+ol.control.BZoomSlider.prototype.getResolutionForValueFunction = function (value, optPower) {
   let power = optPower || 2
   let view = this.getMap().getView()
   let maxResolution = view.getMaxResolution()
   let minResolution = view.getMinResolution()
   let max = Math.log(maxResolution / minResolution) / Math.log(power)
-  return (function (value) {
-    let resolution = maxResolution / Math.pow(power, value * max)
-    return resolution
-  })()
+  return (maxResolution / Math.pow(power, value * max))
 }
 
 /**

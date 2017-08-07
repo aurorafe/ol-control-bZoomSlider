@@ -5,7 +5,6 @@
   <title>Title</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="stylesheet" href="../node_modules/openlayers/dist/ol.css">
-  <link rel="stylesheet" href="../dist/static/css/ol-control-BZoomSlider.css">
   <style>
     html, body, #map {
       width: 100%;
@@ -18,7 +17,6 @@
 <body>
 <div class="map" id="map"></div>
 <script src="../node_modules/openlayers/dist/ol-debug.js"></script>
-<script src="../dist/ol-control-BZoomSlider.js"></script>
 <script type="text/javascript">
   var map = new ol.Map({
     layers: [
@@ -28,7 +26,7 @@
     ],
     target: 'map',
     controls: [
-      new ol.control.BZoomSlider()
+      new ol.control.ZoomSlider()
     ],
     view: new ol.View({
       center: [0, 0],
