@@ -3,7 +3,9 @@
  * @desc 定制缩放控制条(仿百度)
  */
 import './scss/zoomSlider.scss'
-import {DomUtil, css} from './dom'
+import {css} from './dom'
+import * as htmlUtils from 'nature-dom-util/src/domUtils'
+import * as Events from 'nature-dom-util/src/Events'
 ol.control.BZoomSlider = function (params) {
   this.options = params || {}
 
@@ -82,50 +84,60 @@ ol.control.BZoomSlider = function (params) {
    * @private
    * @type {Element}
    */
-  this.element = DomUtil.create('div', (className + ' ' + css.CLASS_UNSELECTABLE))
+  this.element = htmlUtils.create('div', (className + ' ' + css.CLASS_UNSELECTABLE))
 
-  let translateContent = DomUtil.create('div', ('hmap-zoom-slider-translate-content' + ' ' + css.CLASS_SELECTABLE), this.element)
+  let translateContent = htmlUtils.create('div', ('hmap-zoom-slider-translate-content' + ' ' + css.CLASS_SELECTABLE), this.element)
 
-  let silderContent = DomUtil.create('div', ('hmap-zoom-slider-content' + ' ' + css.CLASS_SELECTABLE), this.element)
+  let silderContent = htmlUtils.create('div', ('hmap-zoom-slider-content' + ' ' + css.CLASS_SELECTABLE), this.element)
 
-  let translateN = DomUtil.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-n' + ' ' + css.CLASS_SELECTABLE), translateContent)
+  let translateN = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-n' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateN.setAttribute('title', '向上平移')
-
-  let translateS = DomUtil.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-s' + ' ' + css.CLASS_SELECTABLE), translateContent)
+  Events.listen(translateN, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateN'))
+  let translateS = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-s' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateS.setAttribute('title', '向下平移')
-
-  let translateW = DomUtil.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-w' + ' ' + css.CLASS_SELECTABLE), translateContent)
+  Events.listen(translateS, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateS'))
+  let translateW = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-w' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateW.setAttribute('title', '向左平移')
-
-  let translateE = DomUtil.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-e' + ' ' + css.CLASS_SELECTABLE), translateContent)
+  Events.listen(translateW, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateW'))
+  let translateE = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-e' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateE.setAttribute('title', '向右平移')
-
-  let zoomIn = DomUtil.create('div', ('hmap-zoom-slider-zoom-in' + ' ' + css.CLASS_SELECTABLE), silderContent)
+  Events.listen(translateE, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateE'))
+  let zoomIn = htmlUtils.create('div', ('hmap-zoom-slider-zoom-in' + ' ' + css.CLASS_SELECTABLE), silderContent)
   zoomIn.setAttribute('title', '放大')
+  Events.listen(zoomIn, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handleZoomClick_.bind(this, 1))
 
-  let zoomOut = DomUtil.create('div', ('hmap-zoom-slider-zoom-out' + ' ' + css.CLASS_SELECTABLE), silderContent)
+  let zoomOut = htmlUtils.create('div', ('hmap-zoom-slider-zoom-out' + ' ' + css.CLASS_SELECTABLE), silderContent)
   zoomOut.setAttribute('title', '缩小')
+  Events.listen(zoomOut, Events.eventType.CLICK,
+    ol.control.BZoomSlider.prototype.handleZoomClick_.bind(this, -1))
 
-  let slider = DomUtil.create('div', ('hmap-zoom-slider-zoom-slider' + ' ' + css.CLASS_SELECTABLE), silderContent)
-  let sliderBackgroundTop = DomUtil.create('div', ('slider-background-top' + ' ' + css.CLASS_SELECTABLE), slider)
-  let sliderBackgroundBottom = DomUtil.create('div', ('slider-background-bottom' + ' ' + css.CLASS_SELECTABLE), slider)
-  let sliderBackgroundMask = DomUtil.create('div', ('slider-background-mask' + ' ' + css.CLASS_SELECTABLE), slider)
+  let slider = htmlUtils.create('div', ('hmap-zoom-slider-zoom-slider' + ' ' + css.CLASS_SELECTABLE), silderContent)
+  htmlUtils.create('div', ('slider-background-top' + ' ' + css.CLASS_SELECTABLE), slider)
+  htmlUtils.create('div', ('slider-background-bottom' + ' ' + css.CLASS_SELECTABLE), slider)
+  let sliderBackgroundMask = htmlUtils.create('div', ('slider-background-mask' + ' ' + css.CLASS_SELECTABLE), slider)
   sliderBackgroundMask.setAttribute('title', '缩放到此级别')
-  let sliderBar = DomUtil.create('div', ('slider-bar' + ' ' + css.CLASS_SELECTABLE), slider)
+  let sliderBar = htmlUtils.create('div', ('slider-bar' + ' ' + css.CLASS_SELECTABLE), slider)
   sliderBar.setAttribute('title', '滑动缩放地图')
 
   /**
    * @type {ol.pointer.PointerEventHandler}
    * @private
    */
-  this.dragger_ = new ol.pointer.PointerEventHandler(sliderBar)
-
-  ol.events.listen(this.dragger_, ol.pointer.EventType.POINTERDOWN, this.handleDraggerStart_, this)
-  ol.events.listen(this.dragger_, ol.pointer.EventType.POINTERMOVE, this.handleDraggerDrag_, this)
-  ol.events.listen(this.dragger_, ol.pointer.EventType.POINTERUP, this.handleDraggerEnd_, this)
-  ol.events.listen(sliderBar, ol.events.EventType.CLICK, this.handleContainerClick_, this)
-  ol.events.listen(sliderBackgroundMask, ol.events.EventType.CLICK, ol.events.Event.stopPropagation)
-  let render = this.options['render'] ? this.options['render'] : ol.control.HDZoomSlider.render
+  // this.dragger_ = new ol.pointer.PointerEventHandler(slider)
+  //
+  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERDOWN, this.handleDraggerStart_, this)
+  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERMOVE, this.handleDraggerDrag_, this)
+  // Events.listen(this.dragger_, ol.pointer.EventType.POINTERUP, this.handleDraggerEnd_, this)
+  Events.listen(slider, Events.eventType.CLICK, this.handleContainerClick_, this)
+  Events.listen(sliderBackgroundMask, Events.eventType.CLICK, function (event) {
+    event.stopPropagation()
+  })
+  let render = this.options['render'] ? this.options['render'] : ol.control.BZoomSlider.render
   ol.control.Control.call(this, {
     element: this.element,
     render: render,
@@ -136,9 +148,57 @@ ol.control.BZoomSlider = function (params) {
 ol.inherits(ol.control.BZoomSlider, ol.control.Control)
 
 /**
+ * 处理缩放点击
+ * @param delta
+ * @param event
+ * @private
+ */
+ol.control.BZoomSlider.prototype.handleZoomClick_ = function (delta, event) {
+  event.preventDefault()
+  this.zoomByDelta_(delta)
+}
+
+/**
+ * 处理平移点击事件
+ * @param type
+ * @param event
+ * @private
+ */
+ol.control.BZoomSlider.prototype.handletranslateClick_ = function (type, event) {
+  event.preventDefault()
+  console.log(type)
+}
+
+/**
+ * @param {number} delta Zoom delta.
+ * @private
+ */
+ol.control.BZoomSlider.prototype.zoomByDelta_ = function (delta) {
+  let view = this.getMap().getView()
+  if (view && view instanceof ol.View) {
+    let currentResolution = view.getResolution()
+    if (currentResolution) {
+      let newResolution = view.constrainResolution(currentResolution, delta)
+      if (this.duration_ > 0) {
+        if (view.getAnimating()) {
+          view.cancelAnimations()
+        }
+        view.animate({
+          resolution: newResolution,
+          duration: this.duration_,
+          easing: ol.easing.easeOut
+        })
+      } else {
+        view.setResolution(newResolution)
+      }
+    }
+  }
+}
+
+/**
  * 更新控制条element
  * @param {ol.MapEvent} mapEvent Map event.
- * @this {ol.control.ZoomSlider}
+ * @this {ol.control.BZoomSlider}
  * @api
  */
 ol.control.BZoomSlider.render = function (mapEvent) {
@@ -189,46 +249,42 @@ ol.control.BZoomSlider.prototype.disposeInternal = function () {
 }
 
 /**
- * Initializes the slider element. This will determine and set this controls
- * direction_ and also constrain the dragging of the thumb to always be within
- * the bounds of the container.
- *
+ * 初始化滑块元素
  * @private
  */
-ol.control.ZoomSlider.prototype.initSlider_ = function () {
-  var container = this.element
-  var containerSize = {
+ol.control.BZoomSlider.prototype.initSlider_ = function () {
+  let container = this.element
+  let containerSize = {
     width: container.offsetWidth, height: container.offsetHeight
   }
-  var thumb = container.firstElementChild
-  var computedStyle = getComputedStyle(thumb)
-  var thumbWidth = thumb.offsetWidth +
+  let thumb = container.firstElementChild
+  let computedStyle = getComputedStyle(thumb)
+  let thumbWidth = thumb.offsetWidth +
     parseFloat(computedStyle['marginRight']) +
     parseFloat(computedStyle['marginLeft'])
-  var thumbHeight = thumb.offsetHeight +
+  let thumbHeight = thumb.offsetHeight +
     parseFloat(computedStyle['marginTop']) +
     parseFloat(computedStyle['marginBottom'])
   this.thumbSize_ = [thumbWidth, thumbHeight]
   if (containerSize.width > containerSize.height) {
-    this.direction_ = ol.control.ZoomSlider.Direction_.HORIZONTAL
+    this.direction_ = ol.control.BZoomSlider.Direction_.HORIZONTAL
     this.widthLimit_ = containerSize.width - thumbWidth
   } else {
-    this.direction_ = ol.control.ZoomSlider.Direction_.VERTICAL
+    this.direction_ = ol.control.BZoomSlider.Direction_.VERTICAL
     this.heightLimit_ = containerSize.height - thumbHeight
   }
   this.sliderInitialized_ = true
 }
 
 /**
- * @param {Event} event The browser event to handle.
+ * 容器点击事件处理
+ * @param event
  * @private
  */
-ol.control.ZoomSlider.prototype.handleContainerClick_ = function(event) {
-  var view = this.getMap().getView()
-  var relativePosition = this.getRelativePosition_(
-    event.offsetX - this.thumbSize_[0] / 2,
-    event.offsetY - this.thumbSize_[1] / 2)
-  var resolution = this.getResolutionForPosition_(relativePosition)
+ol.control.BZoomSlider.prototype.handleContainerClick_ = function (event) {
+  let view = this.getMap().getView()
+  let relativePosition = this.getRelativePosition_(event.offsetX - this.thumbSize_[0] / 2, event.offsetY - this.thumbSize_[1] / 2)
+  let resolution = this.getResolutionForPosition_(relativePosition)
   view.animate({
     resolution: view.constrainResolution(resolution),
     duration: this.duration_,
@@ -237,11 +293,11 @@ ol.control.ZoomSlider.prototype.handleContainerClick_ = function(event) {
 }
 
 /**
- * Handle dragger start events.
- * @param {ol.pointer.PointerEvent} event The drag event.
+ * 处理拖拽
+ * @param event
  * @private
  */
-ol.control.ZoomSlider.prototype.handleDraggerStart_ = function (event) {
+ol.control.BZoomSlider.prototype.handleDraggerStart_ = function (event) {
   if (!this.dragging_ && event.originalEvent.target === this.element.firstElementChild) {
     this.getMap().getView().setHint(ol.ViewHint.INTERACTING, 1)
     this.previousX_ = event.clientX
@@ -251,16 +307,16 @@ ol.control.ZoomSlider.prototype.handleDraggerStart_ = function (event) {
 }
 
 /**
- * Handle dragger drag events.
- * @param {ol.pointer.PointerEvent|Event} event The drag event.
+ * 处理拖动事件
+ * @param event
  * @private
  */
-ol.control.ZoomSlider.prototype.handleDraggerDrag_ = function (event) {
+ol.control.BZoomSlider.prototype.handleDraggerDrag_ = function (event) {
   if (this.dragging_) {
-    var element = this.element.firstElementChild
-    var deltaX = event.clientX - this.previousX_ + parseInt(element.style.left, 10)
-    var deltaY = event.clientY - this.previousY_ + parseInt(element.style.top, 10)
-    var relativePosition = this.getRelativePosition_(deltaX, deltaY)
+    let element = this.element.firstElementChild
+    let deltaX = event.clientX - this.previousX_ + parseInt(element.style.left, 10)
+    let deltaY = event.clientY - this.previousY_ + parseInt(element.style.top, 10)
+    let relativePosition = this.getRelativePosition_(deltaX, deltaY)
     this.currentResolution_ = this.getResolutionForPosition_(relativePosition)
     this.getMap().getView().setResolution(this.currentResolution_)
     this.setThumbPosition_(this.currentResolution_)
@@ -270,7 +326,7 @@ ol.control.ZoomSlider.prototype.handleDraggerDrag_ = function (event) {
 }
 
 /**
- * 处理拖拽事件
+ * 处理拖拽结束事件
  * @param event
  * @private
  */
@@ -328,8 +384,42 @@ ol.control.BZoomSlider.prototype.getRelativePosition_ = function (x, y) {
  * @private
  */
 ol.control.BZoomSlider.prototype.getResolutionForPosition_ = function (position) {
-  let fn = this.getMap().getView().getResolutionForValueFunction()
-  return fn(1 - position)
+  let view = this.getMap().getView()
+  if (view && view instanceof ol.View) {
+    return this.getResolutionForValueFunction(1 - position)
+  }
+}
+
+/**
+ * 获取值
+ * @param optPower
+ */
+ol.control.BZoomSlider.prototype.getValueForResolutionFunction = function (optPower) {
+  let power = optPower || 2
+  let view = this.getMap().getView()
+  let maxResolution = view.getMaxResolution()
+  let minResolution = view.getMinResolution()
+  let max = Math.log(maxResolution / minResolution) / Math.log(power)
+  return (function (resolution) {
+    let value = (Math.log(maxResolution / resolution) / Math.log(power)) / max
+    return value
+  })()
+}
+
+/**
+ * 获取分辨率
+ * @param optPower
+ */
+ol.control.BZoomSlider.prototype.getResolutionForValueFunction = function (optPower) {
+  let power = optPower || 2
+  let view = this.getMap().getView()
+  let maxResolution = view.getMaxResolution()
+  let minResolution = view.getMinResolution()
+  let max = Math.log(maxResolution / minResolution) / Math.log(power)
+  return (function (value) {
+    let resolution = maxResolution / Math.pow(power, value * max)
+    return resolution
+  })()
 }
 
 /**
@@ -339,6 +429,8 @@ ol.control.BZoomSlider.prototype.getResolutionForPosition_ = function (position)
  * @private
  */
 ol.control.BZoomSlider.prototype.getPositionForResolution_ = function (res) {
-  let fn = this.getMap().getView().getValueForResolutionFunction()
-  return 1 - fn(res)
+  let view = this.getMap().getView()
+  if (view && view instanceof ol.View) {
+    return (1 - this.getValueForResolutionFunction(res))
+  }
 }
