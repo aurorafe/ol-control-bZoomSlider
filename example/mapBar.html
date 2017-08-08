@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../node_modules/openlayers/dist/ol.css">
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="map" id="map"></div>
+<script src="../node_modules/openlayers/dist/ol-debug.js"></script>
+<script type="text/javascript">
+//  var mapBar = 'http://webst03.is.autonavi.com/appmaptile?style=0&x={x}&y={y}&z={z}';
+  var mapBar = 'http://img1.mapbar.com/maplite/mapbank/mapbar/{z}/{x}_{y}/{x}_{y}.png?0621';
+  var mapImages = new ol.layer.Tile({
+    title: "高德卫星影像",
+    source: new ol.source.XYZ({
+      projection: 'EPSG:102100',
+      tileUrlFunction: function (tileCoord, pixelRatio, proj) {
+        var _url = mapBar.replace('{z}', (tileCoord[0]).toString())
+          .replace('{x}', tileCoord[1].toString())
+          .replace('{y}', (-tileCoord[2] - 1).toString());
+        return _url;
+      }
+    })
+  });
+  // 创建地图
+  var map = new ol.Map({
+    layers: [mapImages],
+    view: new ol.View({
+      center: [0, 0],
+      zoom: 2,
+      projection: 'EPSG:102100'
+    }),
+    target: "map"
+  });
+</script>
+</body>
+</html>
