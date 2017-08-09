@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node build/development.js",
+    "travisDev": "node build/development.js --env nowatch",
     "build": "node build/build.js",
     "start": "node build/dev-server.js"
   },

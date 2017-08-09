@@ -5,5 +5,5 @@ cache:
     - node_modules
 install: npm install
 script:
-- npm run dev --env nowatch
+- npm run travisDev
 - npm run build
