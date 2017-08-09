@@ -6,6 +6,7 @@ import './scss/zoomSlider.scss'
 import {css} from './dom'
 import * as htmlUtils from 'nature-dom-util/src/domUtils'
 import * as Events from 'nature-dom-util/src/Events'
+import 'pepjs'
 ol.control.BZoomSlider = function (params) {
   this.options = params || {}
 
@@ -78,6 +79,14 @@ ol.control.BZoomSlider = function (params) {
    * @private
    */
   this.duration_ = this.options['duration'] !== undefined ? this.options['duration'] : 200
+  /**
+   * 视图限制
+   * @type {{ANIMATING: number, INTERACTING: number}}
+   */
+  this.viewHint = {
+    ANIMATING: 0,
+    INTERACTING: 1
+  }
 
   /**
    * @private
@@ -135,15 +144,9 @@ ol.control.BZoomSlider = function (params) {
    */
   this.silderContent = silderContent
 
-  /**
-   * @type {ol.pointer.PointerEventHandler}
-   * @private
-   */
-  this.dragger_ = new ol.pointer.PointerEventHandler(this.silderContent)
-
-  Events.listen(this.dragger_, ol.pointer.EventType.POINTERDOWN, this.handleDraggerStart_, this)
-  Events.listen(this.dragger_, ol.pointer.EventType.POINTERMOVE, this.handleDraggerDrag_, this)
-  Events.listen(this.dragger_, ol.pointer.EventType.POINTERUP, this.handleDraggerEnd_, this)
+  Events.listen(this.silderContent, 'pointerdown', this.handleDraggerStart_, this)
+  Events.listen(this.silderContent, 'pointermove', this.handleDraggerDrag_, this)
+  Events.listen(this.silderContent, 'pointerup', this.handleDraggerEnd_, this)
   Events.listen(this.silderContent, Events.eventType.CLICK, this.handleContainerClick_, this)
   Events.listen(this.sliderBar, Events.eventType.CLICK, function (event) {
     event.stopPropagation()
@@ -297,7 +300,8 @@ ol.control.BZoomSlider.prototype.setMap = function (map) {
  * @inheritDoc
  */
 ol.control.BZoomSlider.prototype.disposeInternal = function () {
-  this.dragger_.dispose()
+  Events.listen(this.silderContent, 'pointercancel', function (event) {
+  }, this)
   ol.control.Control.prototype.disposeInternal.call(this)
 }
 
@@ -351,8 +355,8 @@ ol.control.BZoomSlider.prototype.handleContainerClick_ = function (event) {
  * @private
  */
 ol.control.BZoomSlider.prototype.handleDraggerStart_ = function (event) {
-  if (!this.dragging_ && event.originalEvent.target === htmlUtils.getElementsByClassName('.slider-bar', this.silderContent)) {
-    this.getMap().getView().setHint(ol.ViewHint.INTERACTING, 1)
+  if (!this.dragging_ && event.target === htmlUtils.getElementsByClassName('.slider-bar', this.silderContent)) {
+    // this.getMap().getView().setHint(this.viewHint.INTERACTING, 1)
     this.previousX_ = event.clientX
     this.previousY_ = event.clientY
     this.dragging_ = true
@@ -386,7 +390,7 @@ ol.control.BZoomSlider.prototype.handleDraggerDrag_ = function (event) {
 ol.control.BZoomSlider.prototype.handleDraggerEnd_ = function (event) {
   if (this.dragging_) {
     let view = this.getMap().getView()
-    view.setHint(ol.ViewHint.INTERACTING, -1)
+    // view.setHint(ol.ViewHint.INTERACTING, -1)
     view.animate({
       resolution: view.constrainResolution(this.currentResolution_),
       duration: this.duration_,
@@ -429,7 +433,7 @@ ol.control.BZoomSlider.prototype.getRelativePosition_ = function (x, y) {
   } else {
     amount = y / this.heightLimit_
   }
-  return ol.math.clamp(amount, 0, 1)
+  return Math.min(Math.max(amount, 0), 1)
 }
 
 /**

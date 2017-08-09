@@ -23,7 +23,7 @@ module.exports = merge(baseWebpackConfig, {
     })
   },
   devtool: devtool,
-  watch: ((env === 'nowatch') ? false : (env === 'nowatch')),
+  watch: ((env === 'nowatch') ? false : (env !== 'nowatch')),
   watchOptions: {
     aggregateTimeout: 300,
     poll: 1000,
