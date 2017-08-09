@@ -1,6 +1,7 @@
 # openlayers 扩展 zoomSlider控件
 
 [![Build Status](https://www.travis-ci.org/aurorafe/ol-control-bZoomSlider.svg?branch=master)](https://www.travis-ci.org/aurorafe/ol-control-bZoomSlider)
+[![NPM](https://nodei.co/npm/aurorafe/ol-control-bzoomslider.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aurorafe/ol-control-bzoomslider/)
 
 > 提供地图滑动缩放和平移，支持openlayers3+ 以上。
 
