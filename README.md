@@ -1,7 +1,7 @@
 # openlayers 扩展 zoomSlider控件
 
 [![Build Status](https://www.travis-ci.org/aurorafe/ol-control-bZoomSlider.svg?branch=master)](https://www.travis-ci.org/aurorafe/ol-control-bZoomSlider)
-[![NPM](https://nodei.co/npm/aurorafe/ol-control-bzoomslider.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aurorafe/ol-control-bzoomslider/)
+[![NPM](https://nodei.co/npm/ol-control-bzoomslider.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/ol-control-bzoomslider/)
 
 > 提供地图滑动缩放和平移，支持openlayers3+ 以上。
 
@@ -20,15 +20,15 @@ npm run build
 
 ## Use
 
-> `ol.control.BZoomSlider(options)`
+> `new ol.control.BZoomSlider(options)` or `new olControlBZoomSlider(options)`
 
 ### CDN
 
 ```bash
-https://unpkg.com/ol-control-loading@1.0.0/dist/ol-control-BZoomSlider.min.js
-https://unpkg.com/ol-control-loading@1.0.0/dist/ol-control-BZoomSlider.js
-https://unpkg.com/ol-control-loading@1.0.0/dist/static/css/ol-control-BZoomSlider.css
-https://unpkg.com/ol-control-loading@1.0.0/dist/static/css/ol-control-BZoomSlider.min.css
+https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.min.js
+https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.js
+https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.css
+https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.min.css
 ```
 
 ### NPM
@@ -36,6 +36,12 @@ https://unpkg.com/ol-control-loading@1.0.0/dist/static/css/ol-control-BZoomSlide
 ```bash
 npm install ol-control-bzoomslider --save
 import 'ol-control-bzoomslider'
+new ol.control.BZoomSlider()
+
+// or
+
+import olControlBZoomSlider from 'ol-control-loading'
+new olControlBZoomSlider()
 ```
 
 ## Examples

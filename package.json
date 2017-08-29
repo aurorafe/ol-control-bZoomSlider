@@ -1,8 +1,8 @@
 {
   "name": "ol-control-bzoomslider",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "openlayers zoomslider",
-  "main": "src/index.js",
+  "main": "dist/ol-control-BZoomSlider.js",
   "scripts": {
     "dev": "node build/development.js",
     "travisDev": "node build/development.js --env nowatch",
@@ -20,7 +20,7 @@
     "url": "https://github.com/aurorafe/ol-control-bZoomSlider.git"
   },
   "dependencies": {
-    "nature-dom-util": "^1.0.0",
+    "nature-dom-util": "^1.1.0",
     "openlayers": "^4.2.0",
     "pepjs": "^0.4.3"
   },

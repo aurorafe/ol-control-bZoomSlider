@@ -13,8 +13,9 @@ module.exports = {
     cssSourceMap: true
   },
   base: {
-    libraryName: 'ol-control-BZoomSlider',
+    fileName: 'ol-control-BZoomSlider',
+    libraryName: 'olControlBZoomSlider',
     distDirectory: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static'
+    assetsSubDirectory: ''
   }
 }

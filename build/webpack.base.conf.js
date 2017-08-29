@@ -12,7 +12,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: config.base.distDirectory,
-    filename: config.base.libraryName + (process.env.NODE_ENV === 'production' ? '.min.js' : '.js'),
+    filename: config.base.fileName + (process.env.NODE_ENV === 'production' ? '.min.js' : '.js'),
     library: config.base.libraryName,
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -24,19 +24,24 @@ module.exports = {
     rules: [
       {
         test: /(\.jsx|\.js)$/,
-        enforce: 'pre',  // 在babel-loader对源码进行编译前进行lint的检查
-        loaders: [
-          'babel-loader',
-          'eslint-loader'
-        ],
-        exclude: /(node_modules|bower_components)/
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src'), resolve('test')],
+        options: {
+          formatter: require('eslint-friendly-formatter')
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        include: [resolve('src'), resolve('test'), resolve('node_modules/nature-dom-util')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
+          name: utils.assetsPath('img/[name].[ext]')
         }
       },
       {
@@ -44,7 +49,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
+          name: utils.assetsPath('fonts/[name].[ext]')
         }
       }
     ]
@@ -66,14 +71,6 @@ module.exports = {
           ]
         }
       }
-    }),
-    // copy custom static assets
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, '../asset'),
-        to: config.base.assetsSubDirectory,
-        ignore: ['.*']
-      }
-    ])
+    })
   ]
 }

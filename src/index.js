@@ -4,8 +4,9 @@
  */
 import './scss/zoomSlider.scss'
 import {css} from './dom'
-import * as htmlUtils from 'nature-dom-util/src/domUtils'
-import * as Events from 'nature-dom-util/src/Events'
+import * as htmlUtils from 'nature-dom-util/src/utils/domUtils'
+import * as Events from 'nature-dom-util/src/events/Events'
+import {EventType} from 'nature-dom-util/src/events/EventType'
 import 'pepjs'
 ol.control.BZoomSlider = function (params) {
   this.options = params || {}
@@ -107,28 +108,28 @@ ol.control.BZoomSlider = function (params) {
 
   let translateN = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-n' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateN.setAttribute('title', '向上平移')
-  Events.listen(translateN, Events.eventType.CLICK,
+  Events.listen(translateN, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateN'))
   let translateS = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-s' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateS.setAttribute('title', '向下平移')
-  Events.listen(translateS, Events.eventType.CLICK,
+  Events.listen(translateS, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateS'))
   let translateW = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-w' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateW.setAttribute('title', '向左平移')
-  Events.listen(translateW, Events.eventType.CLICK,
+  Events.listen(translateW, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateW'))
   let translateE = htmlUtils.create('div', ('hmap-zoom-slider-button hmap-zoom-slider-translate-e' + ' ' + css.CLASS_SELECTABLE), translateContent)
   translateE.setAttribute('title', '向右平移')
-  Events.listen(translateE, Events.eventType.CLICK,
+  Events.listen(translateE, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handletranslateClick_.bind(this, 'translateE'))
   let zoomIn = htmlUtils.create('div', ('hmap-zoom-slider-zoom-in' + ' ' + css.CLASS_SELECTABLE), silderContent)
   zoomIn.setAttribute('title', '放大')
-  Events.listen(zoomIn, Events.eventType.CLICK,
+  Events.listen(zoomIn, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handleZoomClick_.bind(this, 1))
 
   let zoomOut = htmlUtils.create('div', ('hmap-zoom-slider-zoom-out' + ' ' + css.CLASS_SELECTABLE), silderContent)
   zoomOut.setAttribute('title', '缩小')
-  Events.listen(zoomOut, Events.eventType.CLICK,
+  Events.listen(zoomOut, EventType.CLICK,
     ol.control.BZoomSlider.prototype.handleZoomClick_.bind(this, -1))
 
   let slider = htmlUtils.create('div', ('hmap-zoom-slider-zoom-slider' + ' ' + css.CLASS_SELECTABLE), silderContent)
@@ -147,8 +148,8 @@ ol.control.BZoomSlider = function (params) {
   Events.listen(this.silderContent, 'pointerdown', this.handleDraggerStart_, this)
   Events.listen(this.silderContent, 'pointermove', this.handleDraggerDrag_, this)
   Events.listen(this.silderContent, 'pointerup', this.handleDraggerEnd_, this)
-  Events.listen(this.silderContent, Events.eventType.CLICK, this.handleContainerClick_, this)
-  Events.listen(this.sliderBar, Events.eventType.CLICK, function (event) {
+  Events.listen(this.silderContent, EventType.CLICK, this.handleContainerClick_, this)
+  Events.listen(this.sliderBar, EventType.CLICK, function (event) {
     event.stopPropagation()
   })
   let render = this.options['render'] ? this.options['render'] : ol.control.BZoomSlider.render
@@ -491,3 +492,7 @@ ol.control.BZoomSlider.prototype.getPositionForResolution_ = function (res) {
     return (1 - this.getValueForResolutionFunction(res))
   }
 }
+
+let olControlBZoomSlider = ol.control.BZoomSlider
+
+export default olControlBZoomSlider
