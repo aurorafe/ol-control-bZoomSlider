@@ -40,7 +40,7 @@ new ol.control.BZoomSlider()
 
 // or
 
-import olControlBZoomSlider from 'ol-control-loading'
+import olControlBZoomSlider from 'ol-control-bzoomslider'
 new olControlBZoomSlider()
 ```
 
