@@ -25,10 +25,10 @@ npm run build
 ### CDN
 
 ```bash
-https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.min.js
-https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.js
-https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.css
-https://unpkg.com/ol-control-loading@1.1.0/dist/ol-control-BZoomSlider.min.css
+https://unpkg.com/ol-control-bzoomslider@1.1.0/dist/ol-control-BZoomSlider.min.js
+https://unpkg.com/ol-control-bzoomslider@1.1.0/dist/ol-control-BZoomSlider.js
+https://unpkg.com/ol-control-bzoomslider@1.1.0/dist/ol-control-BZoomSlider.css
+https://unpkg.com/ol-control-bzoomslider@1.1.0/dist/ol-control-BZoomSlider.min.css
 ```
 
 ### NPM
